@@ -3,7 +3,7 @@ package ru.yandex.practicum.statsdto;
 import lombok.Data;
 
 @Data
-public class HitDto {
+public class EndpointHit {
     private Long id;
     private String app;
     private String uri;
