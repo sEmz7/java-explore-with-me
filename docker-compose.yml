@@ -1,7 +1,6 @@
 services:
   stats-server:
-    build:
-      context: ./ewm-stats-server/stats-server
+    build: ./ewm-stats-server/stats-server
     depends_on:
       - stats-db
     ports:
@@ -17,8 +16,7 @@ services:
       - "6543:5432"
 
   ewm-service:
-    build:
-      context: ./ewm-main-server
+    build: ./ewm-main-server
     depends_on:
       - ewm-db
     ports:
