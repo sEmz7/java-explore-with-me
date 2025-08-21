@@ -13,7 +13,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>stats-server</name>
 	<description>stats-server</description>
-	<packaging>jar</packaging>
 	<url/>
 	<licenses>
 		<license/>
