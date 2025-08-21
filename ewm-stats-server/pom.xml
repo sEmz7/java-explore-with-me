@@ -11,7 +11,7 @@
     <groupId>ru.yandex.practicum</groupId>
     <artifactId>ewm-stats-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <name>ewm-stats-server</name>
     <description>ewm-stats-server</description>
     <url/>
