@@ -13,6 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>ewm-main-server</name>
     <description>ewm-main-server</description>
+    <packaging>jar</packaging>
     <url/>
     <licenses>
         <license/>
