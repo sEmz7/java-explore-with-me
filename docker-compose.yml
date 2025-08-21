@@ -9,6 +9,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm_stats
       - SPRING_DATASOURCE_USERNAME=dbuser
       - SPRING_DATASOURCE_PASSWORD=12345
+      - SERVICES_STATSSERVICE_URI=http://stats-server:9090
 
   stats-db:
     image: postgres:16.1
