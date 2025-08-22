@@ -26,14 +26,13 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (end.isBefore(start)) {
             throw new InvalidUserInputException("Дата end не может быть раньше start.");
         }
-        if (unique) {
-            return statsRepository.findUniqueStats(start, end, uris);
-        } else {
-            return statsRepository.findAllStats(start, end, uris);
-        }
+        return unique
+                ? statsRepository.findUniqueStats(start, end, uris)
+                : statsRepository.findAllStats(start, end, uris);
     }
 }
