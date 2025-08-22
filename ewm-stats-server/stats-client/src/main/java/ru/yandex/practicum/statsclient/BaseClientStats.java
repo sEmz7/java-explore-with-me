@@ -1,6 +1,5 @@
 package ru.yandex.practicum.statsclient;
 
-import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
