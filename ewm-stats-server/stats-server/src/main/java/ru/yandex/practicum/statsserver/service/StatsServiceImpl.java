@@ -27,7 +27,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if(end.isBefore(start)) {
+        if (end.isBefore(start)) {
             throw new InvalidUserInputException("Дата end не может быть раньше start.");
         }
         if (unique) {
