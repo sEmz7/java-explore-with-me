@@ -1,0 +1,39 @@
+package ru.yandex.practicum.ewmmainserver.controller.admin;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.ewmmainserver.model.user.dto.UserRequestDto;
+import ru.yandex.practicum.ewmmainserver.model.user.dto.UserResponseDto;
+import ru.yandex.practicum.ewmmainserver.service.UserService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/admin/users")
+@RequiredArgsConstructor
+public class UsersAdminController {
+    private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> getAllUsers(
+            @RequestParam(required = false) List<Long> ids,
+            @Min(0) @RequestParam(defaultValue = "0", required = false) int from,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size) {
+        return ResponseEntity.ok(userService.getAllUsers(ids, from, size));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@Min(1) @PathVariable long userId) {
+        userService.delete(userId);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -47,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toDto(category);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<CategoryResponseDto> getAllCategories(int from, int size) {
         return categoryRepository.findAllFromBySize(from, size)
@@ -55,6 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public CategoryResponseDto getCategoryById(long catId) {
         return categoryMapper.toDto(findCategoryByIdOrThrow(catId));
