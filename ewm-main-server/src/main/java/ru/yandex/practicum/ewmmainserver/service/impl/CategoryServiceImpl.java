@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.ewmmainserver.exception.ConflictException;
 import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryRequestDto;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryResponseDto;
 import ru.yandex.practicum.ewmmainserver.model.category.mapper.CategoryMapper;
 import ru.yandex.practicum.ewmmainserver.repository.CategoryRepository;
 import ru.yandex.practicum.ewmmainserver.exception.NotFoundException;
+import ru.yandex.practicum.ewmmainserver.repository.EventRepository;
 import ru.yandex.practicum.ewmmainserver.service.CategoryService;
 
 import java.util.List;
@@ -23,9 +25,13 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final EventRepository eventRepository;
 
     @Override
     public CategoryResponseDto createCategory(@Valid @RequestBody CategoryRequestDto dto) {
+        if (categoryRepository.findByName(dto.getName()).isPresent()) {
+            throw new ConflictException("Категория с именем " + dto.getName() + " уже существует");
+        }
         CategoryEntity category = categoryMapper.toEntity(dto);
         CategoryEntity savedCategory = categoryRepository.save(category);
         log.debug("Категория с id={} и name={} была создана.", savedCategory.getId(), savedCategory.getName());
@@ -35,6 +41,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(long catId) {
         findCategoryByIdOrThrow(catId);
+        if (eventRepository.existsByCategoryId(catId)) {
+            throw new ConflictException("Категория используется в событиях и не может быть удалена");
+        }
         categoryRepository.deleteById(catId);
         log.debug("Категория с id={} удалена.", catId);
     }
@@ -42,6 +51,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto updateCategory(CategoryRequestDto dto, long catId) {
         CategoryEntity category = findCategoryByIdOrThrow(catId);
+        if (categoryRepository.findByName(dto.getName()).isPresent() && !dto.getName().equals(category.getName())) {
+            throw new ConflictException("Категория с именем " + dto.getName() + " уже существует");
+        }
         category.setName(dto.getName());
         log.debug("У категории с id={} изменено поле name на '{}'", category.getId(), category.getName());
         return categoryMapper.toDto(category);
