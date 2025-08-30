@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.service.EventService;
 
 import java.util.List;
@@ -36,5 +37,12 @@ public class EventPrivateController {
     public ResponseEntity<EventFullDto> getEventByIdAndUser(@Min(1) @PathVariable long userId,
                                                      @Min(1) @PathVariable long eventId) {
         return ResponseEntity.ok(eventService.getById(userId, eventId));
+    }
+
+    @PatchMapping("/{eventId}")
+    public ResponseEntity<EventFullDto> updateEvent(@RequestBody UpdateEventDto dto,
+                                                    @Min(1) @PathVariable long userId,
+                                                    @Min(1) @PathVariable long eventId) {
+        return ResponseEntity.ok(eventService.update(dto, userId, eventId));
     }
 }

@@ -11,8 +11,11 @@ import ru.yandex.practicum.ewmmainserver.exception.ConflictException;
 import ru.yandex.practicum.ewmmainserver.exception.NotFoundException;
 import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
+import ru.yandex.practicum.ewmmainserver.model.event.EventStateAction;
+import ru.yandex.practicum.ewmmainserver.model.event.EventState;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.mapper.EventMapper;
 import ru.yandex.practicum.ewmmainserver.model.user.UserEntity;
 import ru.yandex.practicum.ewmmainserver.repository.CategoryRepository;
@@ -52,10 +55,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto create(NewEventDto dto, long userId) {
         UserEntity user = findUserByIdOrThrow(userId);
         EventEntity event = eventMapper.toEntity(dto);
-        CategoryEntity category = categoryRepository.findById(dto.getCategory()).orElseThrow(() -> {
-            log.warn("Нет категории c id={}", dto.getCategory());
-            return new NotFoundException("Нет категории с id=" + dto.getCategory());
-        });
+        CategoryEntity category = findCategoryByIdOrThrow(dto.getCategory());
         if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException("Дата события должна быть не ранее чем через 2 часа от текущего момента");
         }
@@ -71,13 +71,35 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getById(long userId, long eventId) {
         UserEntity user = findUserByIdOrThrow(userId);
-        EventEntity event = eventRepository.findById(eventId).orElseThrow(() -> {
-            log.warn("Нет события с id={}", eventId);
-            return new NotFoundException("Нет события с id=" + eventId);
-        });
+        EventEntity event = findEventByIdOrThrow(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
             throw new ConflictException("Просмотреть событие может только его владелец");
         }
+        return eventMapper.toDto(event);
+    }
+
+    @Override
+    public EventFullDto update(UpdateEventDto dto, long userId, long eventId) {
+        EventEntity event = findEventByIdOrThrow(eventId);
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new ConflictException("Редактировать событие может только его владелец");
+        }
+        if (event.getState().equals(EventState.PUBLISHED)) {
+            throw new ConflictException("Нельзя отредактировать опубликованное событие");
+        }
+        if (dto.getEventDate() != null && dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new ConflictException(
+                    "Дата и время события должны быть не ранее чем через 2 часа от текущего момента"
+            );
+        }
+        if (dto.getCategory() != null) {
+            CategoryEntity category = findCategoryByIdOrThrow(dto.getCategory());
+            event.setCategory(category);
+        }
+        if (dto.getStateAction() != null && dto.getStateAction().equals(EventStateAction.CANCEL_REVIEW.toString())) {
+            event.setState(EventState.CANCELED);
+        }
+        eventMapper.updateEventFromDto(dto, event);
         return eventMapper.toDto(event);
     }
 
@@ -87,4 +109,19 @@ public class EventServiceImpl implements EventService {
             return new NotFoundException("Нет пользователя с id=" + userId);
         });
     }
+
+    private EventEntity findEventByIdOrThrow(long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() -> {
+            log.warn("Нет события с id={}", eventId);
+            return new NotFoundException("Нет события с id=" + eventId);
+        });
+    }
+
+    private CategoryEntity findCategoryByIdOrThrow(long catId) {
+        return categoryRepository.findById(catId).orElseThrow(() -> {
+            log.warn("Нет категории c id={}", catId);
+            return new NotFoundException("Нет категории с id=" + catId);
+        });
+    }
+
 }

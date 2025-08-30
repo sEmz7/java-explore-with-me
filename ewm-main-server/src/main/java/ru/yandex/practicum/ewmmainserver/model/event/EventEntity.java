@@ -57,7 +57,7 @@ public class EventEntity {
     private Boolean requestModeration = true;
 
     @Enumerated(EnumType.STRING)
-    private EventState state = EventState.WAITING;
+    private EventState state = EventState.PENDING;
 
     @Column(length = 255, nullable = false)
     private String title;
