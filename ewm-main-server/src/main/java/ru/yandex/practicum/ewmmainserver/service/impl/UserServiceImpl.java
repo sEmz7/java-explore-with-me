@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto create(UserRequestDto dto) {
-        if(userRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new ConflictException("Пользователь с email={" + dto.getEmail() + "} уже зарегистрирован.");
         }
         UserEntity userEntity = userMapper.toEntity(dto);

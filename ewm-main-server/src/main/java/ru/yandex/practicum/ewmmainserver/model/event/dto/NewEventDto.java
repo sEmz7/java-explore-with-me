@@ -36,7 +36,7 @@ public class NewEventDto {
 
     private Integer participantLimit;
 
-    private Boolean requestModeration ;
+    private Boolean requestModeration;
 
     @NotBlank
     @Size(min = 3, max = 120)
