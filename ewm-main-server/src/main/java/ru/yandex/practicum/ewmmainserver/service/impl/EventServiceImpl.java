@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewmmainserver.exception.ConflictException;
+import ru.yandex.practicum.ewmmainserver.exception.InvalidInputException;
 import ru.yandex.practicum.ewmmainserver.exception.NotFoundException;
 import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
@@ -101,6 +102,43 @@ public class EventServiceImpl implements EventService {
         }
         eventMapper.updateEventFromDto(dto, event);
         return eventMapper.toDto(event);
+    }
+
+    @Override
+    public EventFullDto editStatus(UpdateEventDto dto, long eventId) {
+        EventEntity event = findEventByIdOrThrow(eventId);
+        if (dto.getStateAction() != null) {
+            EventStateAction action = EventStateAction.valueOf(dto.getStateAction());
+            switch (action) {
+                case PUBLISH_EVENT ->  publishEvent(event);
+                case REJECT_EVENT -> rejectEvent(event);
+            }
+        }
+        if (event.getPublishedOn() != null && dto.getEventDate() != null) {
+            if (dto.getEventDate().isBefore(event.getPublishedOn().plusHours(1))) {
+                throw new ConflictException(
+                        "Дата начала изменяемого события должна быть не ранее чем за час от даты публикации"
+                );
+            }
+        }
+        eventMapper.updateEventFromDto(dto, event);
+        return eventMapper.toDto(event);
+    }
+
+    private void publishEvent(EventEntity event) {
+        if (event.getState() != EventState.PENDING) {
+            throw new ConflictException("Событие можно опубликовать, только если оно в состоянии ожидания публикации");
+        }
+        event.setState(EventState.PUBLISHED);
+        event.setPublishedOn(LocalDateTime.now());
+    }
+
+    private void rejectEvent(EventEntity event) {
+        if (event.getState() == EventState.PUBLISHED) {
+            throw new ConflictException("Cобытие можно отменить, только если оно еще не опубликовано");
+        }
+        event.setState(EventState.CANCELED);
+        event.setPublishedOn(null);
     }
 
     private UserEntity findUserByIdOrThrow(long userId) {

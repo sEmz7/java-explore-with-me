@@ -15,4 +15,6 @@ public interface EventService {
 
     EventFullDto update(UpdateEventDto dto, long userId, long eventId);
 
+    EventFullDto editStatus(UpdateEventDto dto, long eventId);
+
 }
