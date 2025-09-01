@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.yandex.practicum.ewmmainserver.repository.EventRepository;
 import ru.yandex.practicum.ewmmainserver.service.impl.CategoryServiceImpl;
 import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryRequestDto;
@@ -27,6 +28,9 @@ public class CategoryServiceTests {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @Mock
     private CategoryMapper categoryMapper;
@@ -87,6 +91,7 @@ public class CategoryServiceTests {
     @Test
     void deleteCategory_whenCategoryExists_shouldDelete() {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(categoryEntity));
+        when(eventRepository.existsByCategoryId(1L)).thenReturn(false);
 
         categoryService.deleteCategory(1L);
 
