@@ -8,12 +8,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.ewmmainserver.exception.ConflictException;
-import ru.yandex.practicum.ewmmainserver.exception.InvalidInputException;
 import ru.yandex.practicum.ewmmainserver.exception.NotFoundException;
 import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
-import ru.yandex.practicum.ewmmainserver.model.event.EventStateAction;
 import ru.yandex.practicum.ewmmainserver.model.event.EventState;
+import ru.yandex.practicum.ewmmainserver.model.event.EventStateAction;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
@@ -123,6 +122,20 @@ public class EventServiceImpl implements EventService {
         }
         eventMapper.updateEventFromDto(dto, event);
         return eventMapper.toDto(event);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<EventFullDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
+                                           LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
+        Pageable pageable = PageRequest.of(0, from + size, Sort.by("id"));
+        return eventRepository.searchEvents(users, states, categories, rangeStart, rangeEnd, pageable)
+                .getContent()
+                .stream()
+                .skip(from)
+                .limit(size)
+                .map(eventMapper::toDto)
+                .toList();
     }
 
     private void publishEvent(EventEntity event) {
