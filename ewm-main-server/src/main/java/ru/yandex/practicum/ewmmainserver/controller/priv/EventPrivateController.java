@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.EventRequestStatusUpdateRequest;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.EventRequestStatusUpdateResult;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.RequestDto;
 import ru.yandex.practicum.ewmmainserver.service.EventService;
+import ru.yandex.practicum.ewmmainserver.service.RequestService;
 
 import java.util.List;
 
@@ -18,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventPrivateController {
     private final EventService eventService;
+    private final RequestService requestService;
 
     @GetMapping
     public ResponseEntity<List<EventFullDto>> getAllEventsByUser(@Min(1) @PathVariable long userId,
@@ -44,5 +49,19 @@ public class EventPrivateController {
                                                     @Min(1) @PathVariable long userId,
                                                     @Min(1) @PathVariable long eventId) {
         return ResponseEntity.ok(eventService.update(dto, userId, eventId));
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public ResponseEntity<List<RequestDto>> getEventRequests(@Min(1) @PathVariable long userId,
+                                                             @Min(1) @PathVariable long eventId) {
+        return ResponseEntity.ok(requestService.getEventRequests(userId, eventId));
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public ResponseEntity<EventRequestStatusUpdateResult> updateRequestsStatuses(
+                                                            @Min(1) @PathVariable long userId,
+                                                            @Min(1) @PathVariable long eventId,
+                                                            @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
+        return ResponseEntity.ok(requestService.updateRequestsStatuses(userId, eventId, dto));
     }
 }

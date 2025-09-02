@@ -10,6 +10,8 @@ import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventState;
 import ru.yandex.practicum.ewmmainserver.model.participationRequest.RequestEntity;
 import ru.yandex.practicum.ewmmainserver.model.participationRequest.RequestStatus;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.EventRequestStatusUpdateRequest;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.EventRequestStatusUpdateResult;
 import ru.yandex.practicum.ewmmainserver.model.participationRequest.dto.RequestDto;
 import ru.yandex.practicum.ewmmainserver.model.participationRequest.mapper.RequestMapper;
 import ru.yandex.practicum.ewmmainserver.model.user.UserEntity;
@@ -19,6 +21,7 @@ import ru.yandex.practicum.ewmmainserver.repository.UserRepository;
 import ru.yandex.practicum.ewmmainserver.service.RequestService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -77,6 +80,83 @@ public class RequestServiceImpl implements RequestService {
         });
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toDto(request);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<RequestDto> getEventRequests(long userId, long eventId) {
+        findUserByIdOrThrow(userId);
+        findEventByIdOrThrow(eventId);
+        List<RequestEntity> requests = requestRepository.findAllByEventId(eventId);
+        return requests.stream()
+                .map(requestMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public EventRequestStatusUpdateResult updateRequestsStatuses(long userId, long eventId,
+                                                                 EventRequestStatusUpdateRequest dto) {
+        EventEntity event = findEventByIdOrThrow(eventId);
+        List<RequestEntity> eventRequests = requestRepository.findAllByEventId(eventId);
+        findUserByIdOrThrow(userId);
+        List<RequestEntity> inputRequests = requestRepository.findAllByIdIn(dto.getRequestIds());
+        return switch (dto.getStatus()) {
+            case CONFIRMED -> confirmRequests(eventRequests, inputRequests, event);
+            case PENDING, CANCELED -> new EventRequestStatusUpdateResult(new ArrayList<>(), new ArrayList<>());
+            case REJECTED -> cancelRequests(inputRequests, event);
+        };
+    }
+
+    private EventRequestStatusUpdateResult confirmRequests(List<RequestEntity> eventRequests,
+                                                           List<RequestEntity> requests,
+                                                           EventEntity event) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
+            List<RequestDto> requestDtos = requests.stream()
+                    .map(requestMapper::toDto)
+                    .toList();
+            return new EventRequestStatusUpdateResult(requestDtos, new ArrayList<>());
+        }
+        int eventRequestsSize = eventRequests.size();
+        if (event.getParticipantLimit() == eventRequestsSize) {
+            throw new ConflictException(
+                    "Нельзя подтвердить заявку, так как уже достигнут лимит по заявкам на данное событие"
+            );
+        }
+        List<RequestDto> confirmed = new ArrayList<>();
+        List<RequestDto> rejected = new ArrayList<>();
+        for (RequestEntity request : requests) {
+            if (request.getStatus() != RequestStatus.PENDING) {
+                throw new ConflictException(
+                        "Статус можно изменить только у заявок, находящихся в состоянии ожидания"
+                );
+            }
+            if (event.getParticipantLimit() == eventRequestsSize) {
+                request.setStatus(RequestStatus.REJECTED);
+                rejected.add(requestMapper.toDto(request));
+            } else {
+                request.setStatus(RequestStatus.CONFIRMED);
+                eventRequestsSize++;
+                confirmed.add(requestMapper.toDto(request));
+            }
+        }
+        return new EventRequestStatusUpdateResult(confirmed, rejected);
+    }
+
+    private EventRequestStatusUpdateResult cancelRequests(List<RequestEntity> requests, EventEntity event) {
+        requests
+                .forEach(request -> {
+                    if (request.getStatus() != RequestStatus.PENDING) {
+                        throw new ConflictException(
+                                "Статус можно изменить только у заявок, находящихся в состоянии ожидания"
+                        );
+                    }
+                    request.setStatus(RequestStatus.REJECTED);
+                });
+        List<RequestDto> dtos = requests
+                .stream()
+                .map(requestMapper::toDto)
+                .toList();
+        return new EventRequestStatusUpdateResult(new ArrayList<>(), dtos);
     }
 
     private UserEntity findUserByIdOrThrow(long userId) {
