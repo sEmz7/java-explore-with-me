@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS events (
     location_lon FLOAT NOT NULL,
     paid bool NOT NULL,
     participant_limit int NOT NULL,
-    published_on timestamp NOT NULL,
+    published_on timestamp,
     request_moderation bool NOT NULL,
     state varchar(50) NOT NULL,
     title varchar(255) NOT NULL,

@@ -1,8 +1,6 @@
 package ru.yandex.practicum.ewmmainserver.model.compilation.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import ru.yandex.practicum.ewmmainserver.model.compilation.CompilationEntity;
 import ru.yandex.practicum.ewmmainserver.model.compilation.dto.CompilationDto;
 import ru.yandex.practicum.ewmmainserver.model.compilation.dto.NewCompilationDto;
@@ -18,6 +16,7 @@ public interface CompilationMapper {
 
     CompilationDto toDto(CompilationEntity entity);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "events", ignore = true)
     @Mapping(target = "id", ignore = true)
     CompilationEntity updateEntity(UpdateCompilationDto updateDto, @MappingTarget CompilationEntity entity);
