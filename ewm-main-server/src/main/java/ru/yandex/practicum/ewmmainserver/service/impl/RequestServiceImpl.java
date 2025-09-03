@@ -58,7 +58,8 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Нельзя участвовать в неопубликованном событии");
         }
         if (event.getParticipantLimit() != 0
-                && requestRepository.findAllByEventId(eventId).size() == event.getParticipantLimit()) {
+                && requestRepository.findAllByEventIdAndStatus(eventId, RequestStatus.CONFIRMED).size()
+                == event.getParticipantLimit()) {
             throw new ConflictException("У события достигнут лимит запросов на участие");
         }
         RequestEntity request = new RequestEntity();

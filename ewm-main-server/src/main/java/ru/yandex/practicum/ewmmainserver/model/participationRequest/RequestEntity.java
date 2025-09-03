@@ -18,11 +18,11 @@ public class RequestEntity {
     @Column(name = "created_date")
     private LocalDateTime created;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_id")
     private EventEntity event;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "requester_id")
     private UserEntity requester;
 

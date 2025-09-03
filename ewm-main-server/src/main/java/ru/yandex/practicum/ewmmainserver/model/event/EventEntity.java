@@ -45,10 +45,10 @@ public class EventEntity {
     @Column(name = "location_lon")
     private Float locationLon;
 
-    private Boolean paid = false;
+    private Boolean paid;
 
     @Column(name = "participant_limit")
-    private Integer participantLimit = 0;
+    private Integer participantLimit;
 
     @Column(name = "published_on")
     private LocalDateTime publishedOn;

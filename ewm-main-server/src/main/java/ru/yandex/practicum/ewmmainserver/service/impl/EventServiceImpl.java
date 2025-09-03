@@ -106,7 +106,9 @@ public class EventServiceImpl implements EventService {
         if (dto.getStateAction() != null && dto.getStateAction().equals(EventStateAction.CANCEL_REVIEW.toString())) {
             event.setState(EventState.CANCELED);
         }
-        if (event.getState() == EventState.CANCELED) {
+        if (event.getState() == EventState.CANCELED
+                && dto.getStateAction() != null
+                && !dto.getStateAction().equals(EventStateAction.CANCEL_REVIEW.toString())) {
             event.setState(EventState.PENDING);
         }
         eventMapper.updateEventFromDto(dto, event);
