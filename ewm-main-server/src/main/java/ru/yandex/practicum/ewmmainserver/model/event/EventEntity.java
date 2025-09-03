@@ -19,7 +19,7 @@ public class EventEntity {
     @Column(length = 2000, nullable = false)
     private String annotation;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
@@ -35,7 +35,7 @@ public class EventEntity {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "initiator_id")
     private UserEntity initiator;
 

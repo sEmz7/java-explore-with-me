@@ -1,5 +1,6 @@
 package ru.yandex.practicum.ewmmainserver.model.compilation.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,6 @@ public class UpdateCompilationDto {
 
     private Boolean pinned;
 
+    @Size(min = 1, max = 50)
     private String title;
 }

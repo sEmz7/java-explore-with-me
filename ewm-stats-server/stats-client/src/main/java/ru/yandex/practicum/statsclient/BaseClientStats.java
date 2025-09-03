@@ -13,30 +13,25 @@ public class BaseClientStats {
         this.restTemplate = restTemplate;
     }
 
-    protected <T> ResponseEntity<Object> post(String path, Map<String, Object> params, T body) {
-        return this.doRequest(HttpMethod.POST, path, params, body);
+    protected <T, R> ResponseEntity<R> post(String path, Map<String, Object> params, T body, Class<R> responseType) {
+        return doRequest(HttpMethod.POST, path, params, body, responseType);
     }
 
-    protected <T> ResponseEntity<Object> get(String path, Map<String, Object> params, T body) {
-        return this.doRequest(HttpMethod.GET, path, params, body);
+    protected <T> ResponseEntity<T> get(String path, Map<String, Object> params, Class<T> responseType) {
+        return doRequest(HttpMethod.GET, path, params, null, responseType);
     }
 
-    private <T> ResponseEntity<Object> doRequest(HttpMethod method,
-                                                 String path,
-                                                 Map<String, Object> params,
-                                                 T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, this.addHeaders());
-        ResponseEntity<Object> response;
+    private <T, R> ResponseEntity<R> doRequest(HttpMethod method, String path, Map<String, Object> params, T body, Class<R> responseType) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, addHeaders());
         try {
             if (params != null) {
-                response = restTemplate.exchange(path, method, requestEntity, Object.class, params);
+                return restTemplate.exchange(path, method, requestEntity, responseType, params);
             } else {
-                response = restTemplate.exchange(path, method, requestEntity, Object.class);
+                return restTemplate.exchange(path, method, requestEntity, responseType);
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            throw new RuntimeException("Request failed: " + e.getResponseBodyAsString(), e);
         }
-        return response;
     }
 
     private HttpHeaders addHeaders() {

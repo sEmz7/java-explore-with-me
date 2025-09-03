@@ -29,6 +29,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
                                          @Param("rangeStart") LocalDateTime rangeStart,
                                          @Param("rangeEnd") LocalDateTime rangeEnd,
                                          Pageable pageable);
+
     @Query("SELECT e FROM EventEntity e " +
             "LEFT JOIN RequestEntity r ON r.status = 'CONFIRMED' AND r.event.id = e.id " +
             "WHERE (:text IS NULL OR e.annotation ilike %:text% OR e.description ilike %:text%) " +

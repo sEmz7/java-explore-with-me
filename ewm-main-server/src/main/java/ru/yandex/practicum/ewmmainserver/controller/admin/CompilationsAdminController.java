@@ -29,7 +29,7 @@ public class CompilationsAdminController {
     }
 
     @PatchMapping("/{compId}")
-    public ResponseEntity<CompilationDto> updateCompilation(@RequestBody UpdateCompilationDto updateDto,
+    public ResponseEntity<CompilationDto> updateCompilation(@Valid @RequestBody UpdateCompilationDto updateDto,
                                                             @Min(1) @PathVariable long compId) {
         return ResponseEntity.ok(compilationService.update(updateDto, compId));
     }

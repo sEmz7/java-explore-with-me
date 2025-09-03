@@ -19,16 +19,17 @@ import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.mapper.EventMapper;
-import ru.yandex.practicum.ewmmainserver.model.participationRequest.RequestEntity;
 import ru.yandex.practicum.ewmmainserver.model.user.UserEntity;
 import ru.yandex.practicum.ewmmainserver.repository.CategoryRepository;
 import ru.yandex.practicum.ewmmainserver.repository.EventRepository;
-import ru.yandex.practicum.ewmmainserver.repository.RequestRepository;
 import ru.yandex.practicum.ewmmainserver.repository.UserRepository;
 import ru.yandex.practicum.ewmmainserver.service.EventService;
+import ru.yandex.practicum.statsclient.StatsClient;
+import ru.yandex.practicum.statsdto.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -39,6 +40,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
+    private final StatsClient statsClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -104,6 +106,9 @@ public class EventServiceImpl implements EventService {
         if (dto.getStateAction() != null && dto.getStateAction().equals(EventStateAction.CANCEL_REVIEW.toString())) {
             event.setState(EventState.CANCELED);
         }
+        if (event.getState() == EventState.CANCELED) {
+            event.setState(EventState.PENDING);
+        }
         eventMapper.updateEventFromDto(dto, event);
         return eventMapper.toDto(event);
     }
@@ -162,13 +167,17 @@ public class EventServiceImpl implements EventService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public EventFullDto getEvent(long eventId) {
         EventEntity event = findEventByIdOrThrow(eventId);
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Событие с id=" + eventId + " не найдено");
         }
+        List<ViewStats> viewStats = statsClient.getStats(event.getPublishedOn(),LocalDateTime.now(),
+                List.of("/events/" + event.getId()), true);
+        Optional<ViewStats> eventViews = viewStats.stream()
+                .filter(stats -> stats.getUri().equals("/events/" + event.getId())).findFirst();
+        event.setViews(eventViews.map(stats -> stats.getHits().intValue()).orElse(1));
         return eventMapper.toDto(event);
     }
 

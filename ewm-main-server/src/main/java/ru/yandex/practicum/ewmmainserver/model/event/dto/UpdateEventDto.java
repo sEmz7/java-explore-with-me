@@ -1,9 +1,7 @@
 package ru.yandex.practicum.ewmmainserver.model.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +28,7 @@ public class UpdateEventDto {
 
     private Boolean paid;
 
+    @Positive
     private Integer participantLimit;
 
     private Boolean requestModeration;

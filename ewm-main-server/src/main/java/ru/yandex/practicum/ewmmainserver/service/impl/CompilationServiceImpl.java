@@ -35,12 +35,14 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto create(NewCompilationDto newDto) {
         CompilationEntity compilation = compilationMapper.toEntity(newDto);
         Set<EventEntity> events = new HashSet<>();
-        newDto.getEvents().forEach(compId -> {
-            EventEntity event = eventRepository.findById(compId)
-                    .orElseThrow(() -> new NotFoundException("Не найдено событие с id=" + compId));
-            events.add(event);
-        });
-        compilation.setEvents(events);
+        if (newDto.getEvents() != null) {
+            newDto.getEvents().forEach(compId -> {
+                EventEntity event = eventRepository.findById(compId)
+                        .orElseThrow(() -> new NotFoundException("Не найдено событие с id=" + compId));
+                events.add(event);
+            });
+            compilation.setEvents(events);
+        }
         CompilationEntity saved = compilationRepository.save(compilation);
         return compilationMapper.toDto(saved);
     }

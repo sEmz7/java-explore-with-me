@@ -1,6 +1,5 @@
 package ru.yandex.practicum.ewmmainserver.controller.admin;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

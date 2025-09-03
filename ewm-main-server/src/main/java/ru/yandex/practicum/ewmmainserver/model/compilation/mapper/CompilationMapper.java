@@ -13,10 +13,12 @@ import ru.yandex.practicum.ewmmainserver.model.event.mapper.EventMapper;
 public interface CompilationMapper {
 
     @Mapping(target = "events", ignore = true)
+    @Mapping(target = "id", ignore = true)
     CompilationEntity toEntity(NewCompilationDto dto);
 
     CompilationDto toDto(CompilationEntity entity);
 
     @Mapping(target = "events", ignore = true)
+    @Mapping(target = "id", ignore = true)
     CompilationEntity updateEntity(UpdateCompilationDto updateDto, @MappingTarget CompilationEntity entity);
 }
