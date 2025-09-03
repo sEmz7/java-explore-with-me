@@ -14,7 +14,7 @@ public interface EventService {
 
     EventFullDto create(NewEventDto dto, long userId);
 
-    EventFullDto getById(long userId, long eventId);
+    EventFullDto getUserEventById(long userId, long eventId);
 
     EventFullDto update(UpdateEventDto dto, long userId, long eventId);
 
@@ -26,4 +26,5 @@ public interface EventService {
     List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                   LocalDateTime rangeEnd, Boolean onlyAvailable, SortTypes sort, int from, int size);
 
+    EventFullDto getEvent(long eventId);
 }

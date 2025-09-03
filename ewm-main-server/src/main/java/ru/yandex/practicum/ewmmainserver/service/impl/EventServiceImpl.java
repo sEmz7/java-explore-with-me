@@ -19,9 +19,11 @@ import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.mapper.EventMapper;
+import ru.yandex.practicum.ewmmainserver.model.participationRequest.RequestEntity;
 import ru.yandex.practicum.ewmmainserver.model.user.UserEntity;
 import ru.yandex.practicum.ewmmainserver.repository.CategoryRepository;
 import ru.yandex.practicum.ewmmainserver.repository.EventRepository;
+import ru.yandex.practicum.ewmmainserver.repository.RequestRepository;
 import ru.yandex.practicum.ewmmainserver.repository.UserRepository;
 import ru.yandex.practicum.ewmmainserver.service.EventService;
 
@@ -72,7 +74,7 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(readOnly = true)
     @Override
-    public EventFullDto getById(long userId, long eventId) {
+    public EventFullDto getUserEventById(long userId, long eventId) {
         UserEntity user = findUserByIdOrThrow(userId);
         EventEntity event = findEventByIdOrThrow(eventId);
         if (!user.getId().equals(event.getInitiator().getId())) {
@@ -158,6 +160,16 @@ public class EventServiceImpl implements EventService {
                 .limit(size)
                 .map(eventMapper::toShortDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public EventFullDto getEvent(long eventId) {
+        EventEntity event = findEventByIdOrThrow(eventId);
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new NotFoundException("Событие с id=" + eventId + " не найдено");
+        }
+        return eventMapper.toDto(event);
     }
 
     private void publishEvent(EventEntity event) {

@@ -1,23 +1,18 @@
 package ru.yandex.practicum.ewmmainserver.controller.pub;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.SortTypes;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.service.EventService;
 import ru.yandex.practicum.statsclient.StatsClient;
 import ru.yandex.practicum.statsdto.EndpointHit;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,4 +49,14 @@ public class EventPublicController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventFullDto> getEvent(@PathVariable long eventId, HttpServletRequest request) {
+        EndpointHit endpointHit = new EndpointHit();
+        endpointHit.setApp("ewm-main-service");
+        endpointHit.setUri(request.getRequestURI());
+        endpointHit.setIp(request.getRemoteAddr());
+        endpointHit.setTimestamp(LocalDateTime.now());
+        statsService.hit(endpointHit);
+        return ResponseEntity.ok(eventService.getEvent(eventId));
+    }
 }
