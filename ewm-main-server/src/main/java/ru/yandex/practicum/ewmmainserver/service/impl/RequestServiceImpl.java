@@ -97,18 +97,16 @@ public class RequestServiceImpl implements RequestService {
     public EventRequestStatusUpdateResult updateRequestsStatuses(long userId, long eventId,
                                                                  EventRequestStatusUpdateRequest dto) {
         EventEntity event = findEventByIdOrThrow(eventId);
-        List<RequestEntity> eventRequests = requestRepository.findAllByEventId(eventId);
         findUserByIdOrThrow(userId);
         List<RequestEntity> inputRequests = requestRepository.findAllByIdIn(dto.getRequestIds());
         return switch (dto.getStatus()) {
-            case CONFIRMED -> confirmRequests(eventRequests, inputRequests, event);
+            case CONFIRMED -> confirmRequests(inputRequests, event);
             case PENDING, CANCELED -> new EventRequestStatusUpdateResult(new ArrayList<>(), new ArrayList<>());
-            case REJECTED -> cancelRequests(inputRequests, event);
+            case REJECTED -> cancelRequests(inputRequests);
         };
     }
 
-    private EventRequestStatusUpdateResult confirmRequests(List<RequestEntity> eventRequests,
-                                                           List<RequestEntity> requests,
+    private EventRequestStatusUpdateResult confirmRequests(List<RequestEntity> requests,
                                                            EventEntity event) {
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             List<RequestDto> requestDtos = requests.stream()
@@ -116,8 +114,8 @@ public class RequestServiceImpl implements RequestService {
                     .toList();
             return new EventRequestStatusUpdateResult(requestDtos, new ArrayList<>());
         }
-        int eventRequestsSize = eventRequests.size();
-        if (event.getParticipantLimit() == eventRequestsSize) {
+        int eventConfirmedRequests = event.getConfirmedRequests();
+        if (event.getParticipantLimit() == eventConfirmedRequests) {
             throw new ConflictException(
                     "Нельзя подтвердить заявку, так как уже достигнут лимит по заявкам на данное событие"
             );
@@ -130,19 +128,20 @@ public class RequestServiceImpl implements RequestService {
                         "Статус можно изменить только у заявок, находящихся в состоянии ожидания"
                 );
             }
-            if (event.getParticipantLimit() == eventRequestsSize) {
+            if (event.getParticipantLimit() == eventConfirmedRequests) {
                 request.setStatus(RequestStatus.REJECTED);
                 rejected.add(requestMapper.toDto(request));
             } else {
                 request.setStatus(RequestStatus.CONFIRMED);
-                eventRequestsSize++;
+                eventConfirmedRequests++;
                 confirmed.add(requestMapper.toDto(request));
             }
         }
+        event.setConfirmedRequests(confirmed.size());
         return new EventRequestStatusUpdateResult(confirmed, rejected);
     }
 
-    private EventRequestStatusUpdateResult cancelRequests(List<RequestEntity> requests, EventEntity event) {
+    private EventRequestStatusUpdateResult cancelRequests(List<RequestEntity> requests) {
         requests
                 .forEach(request -> {
                     if (request.getStatus() != RequestStatus.PENDING) {

@@ -5,6 +5,7 @@ import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryResponseDto;
 import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.model.user.UserEntity;
@@ -22,6 +23,7 @@ public interface EventMapper {
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "views", ignore = true)
     EventEntity toEntity(NewEventDto dto);
 
     @Mapping(target = "location.lat", source = "locationLat")
@@ -48,5 +50,8 @@ public interface EventMapper {
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "views", ignore = true)
     void updateEventFromDto(UpdateEventDto dto, @MappingTarget EventEntity entity);
+
+    EventShortDto toShortDto(EventEntity entity);
 }

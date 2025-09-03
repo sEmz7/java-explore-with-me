@@ -23,7 +23,7 @@ public class RequestPrivateController {
 
     @PostMapping
     public ResponseEntity<RequestDto> createRequest(@Min(1) @PathVariable long userId,
-                                                    @Min(1) @RequestParam long eventId) {
+                                                    @Min(0) @RequestParam long eventId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(requestService.createRequest(userId, eventId));
     }
 

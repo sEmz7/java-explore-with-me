@@ -61,4 +61,6 @@ public class EventEntity {
 
     @Column(length = 255, nullable = false)
     private String title;
+
+    private Integer views;
 }

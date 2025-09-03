@@ -1,6 +1,8 @@
 package ru.yandex.practicum.ewmmainserver.service;
 
+import ru.yandex.practicum.ewmmainserver.model.event.SortTypes;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 
@@ -20,5 +22,8 @@ public interface EventService {
 
     List<EventFullDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
                                     LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size);
+
+    List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                  LocalDateTime rangeEnd, Boolean onlyAvailable, SortTypes sort, int from, int size);
 
 }

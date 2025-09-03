@@ -13,7 +13,9 @@ import ru.yandex.practicum.ewmmainserver.model.category.CategoryEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventEntity;
 import ru.yandex.practicum.ewmmainserver.model.event.EventState;
 import ru.yandex.practicum.ewmmainserver.model.event.EventStateAction;
+import ru.yandex.practicum.ewmmainserver.model.event.SortTypes;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
+import ru.yandex.practicum.ewmmainserver.model.event.dto.EventShortDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
 import ru.yandex.practicum.ewmmainserver.model.event.mapper.EventMapper;
@@ -62,6 +64,7 @@ public class EventServiceImpl implements EventService {
         event.setCategory(category);
         event.setInitiator(user);
         event.setCreatedOn(LocalDateTime.now());
+        event.setViews(0);
         EventEntity savedEvent = eventRepository.save(event);
         log.debug("Сохранено событие с id={}", event.getId());
         return eventMapper.toDto(savedEvent);
@@ -135,6 +138,25 @@ public class EventServiceImpl implements EventService {
                 .skip(from)
                 .limit(size)
                 .map(eventMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+            LocalDateTime rangeEnd, Boolean onlyAvailable, SortTypes sort, int from, int size) {
+        Pageable pageable = sort == SortTypes.EVENT_DATE
+                ? PageRequest.of(0, from + size, Sort.by("eventDate"))
+                : PageRequest.of(0, from + size, Sort.by("views"));
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now();
+        }
+        List<EventEntity> events = eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd,
+                onlyAvailable, pageable).getContent();
+        return events.stream()
+                .skip(from)
+                .limit(size)
+                .map(eventMapper::toShortDto)
                 .toList();
     }
 

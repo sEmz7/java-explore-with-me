@@ -34,9 +34,10 @@ public class NewEventDto {
 
     private Boolean paid;
 
+    @Positive
     private Integer participantLimit;
 
-    private Boolean requestModeration;
+    private Boolean requestModeration = true;
 
     @NotBlank
     @Size(min = 3, max = 120)
