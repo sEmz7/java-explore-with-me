@@ -31,8 +31,10 @@ public class EventAdminController {
                                                            @RequestParam(required = false)
                                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                                                LocalDateTime rangeEnd,
-                                                           @RequestParam(defaultValue = "0") int from,
-                                                           @RequestParam(defaultValue = "10") int size) {
+                                                           @PositiveOrZero @RequestParam(defaultValue = "0")
+                                                               int from,
+                                                           @PositiveOrZero @RequestParam(defaultValue = "10")
+                                                               int size) {
         List<EventFullDto> dtos = eventService.searchEvents(
                 users, states, categories, rangeStart, rangeEnd, from, size
         );

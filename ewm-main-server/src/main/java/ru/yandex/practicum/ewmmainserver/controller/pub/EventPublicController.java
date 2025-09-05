@@ -37,8 +37,8 @@ public class EventPublicController {
                                                              LocalDateTime rangeEnd,
                                                          @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                          @RequestParam(required = false) SortTypes sort,
-                                                         @RequestParam(defaultValue = "0") int from,
-                                                         @RequestParam(defaultValue = "10") int size,
+                                                         @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                                         @PositiveOrZero @RequestParam(defaultValue = "10") int size,
                                                          HttpServletRequest request) {
         List<EventShortDto> dtos = eventService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
                 sort, from, size);

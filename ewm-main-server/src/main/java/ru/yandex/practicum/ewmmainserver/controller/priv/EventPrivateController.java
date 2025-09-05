@@ -27,9 +27,12 @@ public class EventPrivateController {
     private final RequestService requestService;
 
     @GetMapping
-    public ResponseEntity<List<EventFullDto>> getAllEventsByUser(@PositiveOrZero @PathVariable long userId,
-                                                                 @RequestParam(defaultValue = "0") int from,
-                                                                 @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<EventFullDto>> getAllEventsByUser(@PositiveOrZero @PathVariable
+                                                                     long userId,
+                                                                 @PositiveOrZero @RequestParam(defaultValue = "0")
+                                                                     int from,
+                                                                 @PositiveOrZero @RequestParam(defaultValue = "10")
+                                                                     int size) {
         return ResponseEntity.ok(eventService.getAllByUser(userId, from, size));
     }
 

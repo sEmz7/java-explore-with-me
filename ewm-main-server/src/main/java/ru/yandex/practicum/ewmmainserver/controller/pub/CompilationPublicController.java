@@ -19,8 +19,10 @@ public class CompilationPublicController {
 
     @GetMapping
     public ResponseEntity<List<CompilationDto>> getCompilations(@RequestParam(required = false) Boolean pinned,
-                                                                @RequestParam(defaultValue = "0") int from,
-                                                                @RequestParam(defaultValue = "10") int size) {
+                                                                @PositiveOrZero @RequestParam(defaultValue = "0")
+                                                                    int from,
+                                                                @PositiveOrZero @RequestParam(defaultValue = "10")
+                                                                    int size) {
         return ResponseEntity.ok(compilationService.getCompilations(pinned, from, size));
     }
 
