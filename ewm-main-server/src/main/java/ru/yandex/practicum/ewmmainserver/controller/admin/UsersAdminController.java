@@ -23,8 +23,8 @@ public class UsersAdminController {
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUsers(
             @RequestParam(required = false) List<Long> ids,
-            @PositiveOrZero @RequestParam(defaultValue = "0", required = false) int from,
-            @PositiveOrZero @RequestParam(defaultValue = "10", required = false) int size) {
+            @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+            @PositiveOrZero @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.getAllUsers(ids, from, size));
     }
 
