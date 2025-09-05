@@ -20,7 +20,6 @@ import ru.yandex.practicum.ewmmainserver.service.CompilationService;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -34,15 +33,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto create(NewCompilationDto newDto) {
         CompilationEntity compilation = compilationMapper.toEntity(newDto);
-        Set<EventEntity> events = new HashSet<>();
-        if (newDto.getEvents() != null) {
-            newDto.getEvents().forEach(compId -> {
-                EventEntity event = eventRepository.findById(compId)
-                        .orElseThrow(() -> new NotFoundException("Не найдено событие с id=" + compId));
-                events.add(event);
-            });
-            compilation.setEvents(events);
-        }
+        applyEvents(compilation, newDto.getEvents());
         CompilationEntity saved = compilationRepository.save(compilation);
         return compilationMapper.toDto(saved);
     }
@@ -57,13 +48,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto update(UpdateCompilationDto updateDto, long compId) {
         CompilationEntity compilation = findCompilationByIdOrThrow(compId);
         compilationMapper.updateEntity(updateDto, compilation);
-        if (updateDto.getEvents() != null) {
-            List<EventEntity> events = eventRepository.findAllById(updateDto.getEvents());
-            if (events.size() != updateDto.getEvents().size()) {
-                throw new NotFoundException("Одно или более событий не найдено");
-            }
-            compilation.setEvents(new HashSet<>(events));
-        }
+        applyEvents(compilation, updateDto.getEvents());
         compilation = compilationRepository.save(compilation);
         return compilationMapper.toDto(compilation);
     }
@@ -83,6 +68,16 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getById(long compId) {
         return compilationMapper.toDto(findCompilationByIdOrThrow(compId));
+    }
+
+    private void applyEvents(CompilationEntity compilation, List<Long> eventIds) {
+        if (eventIds != null) {
+            List<EventEntity> events = eventRepository.findAllById(eventIds);
+            if (events.size() != eventIds.size()) {
+                throw new NotFoundException("Одно или более событий не найдено");
+            }
+            compilation.setEvents(new HashSet<>(events));
+        }
     }
 
     private CompilationEntity findCompilationByIdOrThrow(long compId) {
