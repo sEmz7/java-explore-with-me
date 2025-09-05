@@ -2,6 +2,7 @@ package ru.yandex.practicum.ewmmainserver.controller.pub;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class EventPublicController {
 
     @GetMapping
     public ResponseEntity<List<EventShortDto>> getEvents(@RequestParam(required = false) String text,
-                                                         @RequestParam(required = false) List<@Min(1) Long> categories,
+                                                         @RequestParam(required = false)
+                                                         List<@Min(1) Long> categories,
                                                          @RequestParam(required = false) Boolean paid,
                                                          @RequestParam(required = false)
                                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -50,7 +52,8 @@ public class EventPublicController {
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventFullDto> getEvent(@PathVariable long eventId, HttpServletRequest request) {
+    public ResponseEntity<EventFullDto> getEvent(
+            @PositiveOrZero @PathVariable long eventId, HttpServletRequest request) {
         EndpointHit endpointHit = new EndpointHit();
         endpointHit.setApp("ewm-main-service");
         endpointHit.setUri(request.getRequestURI());

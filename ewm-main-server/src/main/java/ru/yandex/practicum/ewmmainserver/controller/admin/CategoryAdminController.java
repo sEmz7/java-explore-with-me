@@ -1,18 +1,20 @@
 package ru.yandex.practicum.ewmmainserver.controller.admin;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.ewmmainserver.service.CategoryService;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryRequestDto;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryResponseDto;
+import ru.yandex.practicum.ewmmainserver.service.CategoryService;
 
 @RestController
 @RequestMapping(("/admin/categories"))
 @RequiredArgsConstructor
+@Validated
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
@@ -23,7 +25,7 @@ public class CategoryAdminController {
     }
 
     @DeleteMapping("/{catId}")
-    public ResponseEntity<Void> deleteCategory(@Min(1) @PathVariable long catId) {
+    public ResponseEntity<Void> deleteCategory(@PositiveOrZero @PathVariable long catId) {
         categoryService.deleteCategory(catId);
         return ResponseEntity.noContent().build();
     }
@@ -31,7 +33,7 @@ public class CategoryAdminController {
     @PatchMapping("/{catId}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
             @Valid @RequestBody CategoryRequestDto dto,
-            @Min(1) @PathVariable long catId) {
+            @PositiveOrZero @PathVariable long catId) {
         CategoryResponseDto responseDto = categoryService.updateCategory(dto, catId);
         return ResponseEntity.ok(responseDto);
     }

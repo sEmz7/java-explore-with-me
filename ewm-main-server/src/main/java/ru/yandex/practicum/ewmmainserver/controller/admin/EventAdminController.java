@@ -1,10 +1,11 @@
 package ru.yandex.practicum.ewmmainserver.controller.admin;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.UpdateEventDto;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
+@Validated
 public class EventAdminController {
     private final EventService eventService;
 
@@ -39,7 +41,7 @@ public class EventAdminController {
 
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> editEventStatus(@Valid @RequestBody UpdateEventDto dto,
-                                                        @Min(1) @PathVariable long eventId) {
+                                                        @PositiveOrZero @PathVariable long eventId) {
         return ResponseEntity.ok(eventService.editStatus(dto, eventId));
     }
 }

@@ -1,10 +1,11 @@
 package ru.yandex.practicum.ewmmainserver.controller.priv;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.NewEventDto;
@@ -20,12 +21,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{userId}/events")
 @RequiredArgsConstructor
+@Validated
 public class EventPrivateController {
     private final EventService eventService;
     private final RequestService requestService;
 
     @GetMapping
-    public ResponseEntity<List<EventFullDto>> getAllEventsByUser(@Min(1) @PathVariable long userId,
+    public ResponseEntity<List<EventFullDto>> getAllEventsByUser(@PositiveOrZero @PathVariable long userId,
                                                                  @RequestParam(defaultValue = "0") int from,
                                                                  @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(eventService.getAllByUser(userId, from, size));
@@ -33,34 +35,34 @@ public class EventPrivateController {
 
     @PostMapping
     public ResponseEntity<EventFullDto> createEvent(@Valid @RequestBody NewEventDto dto,
-                                                    @Min(1) @PathVariable long userId) {
+                                                    @PositiveOrZero @PathVariable long userId) {
         EventFullDto createdDto = eventService.create(dto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDto);
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventFullDto> getEventByIdAndUser(@Min(1) @PathVariable long userId,
-                                                     @Min(1) @PathVariable long eventId) {
+    public ResponseEntity<EventFullDto> getEventByIdAndUser(@PositiveOrZero @PathVariable long userId,
+                                                            @PositiveOrZero @PathVariable long eventId) {
         return ResponseEntity.ok(eventService.getUserEventById(userId, eventId));
     }
 
     @PatchMapping("/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(@Valid @RequestBody UpdateEventDto dto,
-                                                    @Min(1) @PathVariable long userId,
-                                                    @Min(1) @PathVariable long eventId) {
+                                                    @PositiveOrZero @PathVariable long userId,
+                                                    @PositiveOrZero @PathVariable long eventId) {
         return ResponseEntity.ok(eventService.update(dto, userId, eventId));
     }
 
     @GetMapping("/{eventId}/requests")
-    public ResponseEntity<List<RequestDto>> getEventRequests(@Min(1) @PathVariable long userId,
-                                                             @Min(1) @PathVariable long eventId) {
+    public ResponseEntity<List<RequestDto>> getEventRequests(@PositiveOrZero @PathVariable long userId,
+                                                             @PositiveOrZero @PathVariable long eventId) {
         return ResponseEntity.ok(requestService.getEventRequests(userId, eventId));
     }
 
     @PatchMapping("/{eventId}/requests")
     public ResponseEntity<EventRequestStatusUpdateResult> updateRequestsStatuses(
-                                                            @Min(1) @PathVariable long userId,
-                                                            @Min(1) @PathVariable long eventId,
+                                                            @PositiveOrZero @PathVariable long userId,
+                                                            @PositiveOrZero @PathVariable long eventId,
                                                             @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
         return ResponseEntity.ok(requestService.updateRequestsStatuses(userId, eventId, dto));
     }

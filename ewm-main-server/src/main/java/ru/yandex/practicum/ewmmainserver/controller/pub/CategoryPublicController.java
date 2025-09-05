@@ -1,8 +1,9 @@
 package ru.yandex.practicum.ewmmainserver.controller.pub;
 
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.category.dto.CategoryResponseDto;
 import ru.yandex.practicum.ewmmainserver.service.CategoryService;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
+@Validated
 public class CategoryPublicController {
     private final CategoryService categoryService;
 
@@ -22,7 +24,7 @@ public class CategoryPublicController {
     }
 
     @GetMapping("/{catId}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@Min(1) @PathVariable long catId) {
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PositiveOrZero @PathVariable long catId) {
         return ResponseEntity.ok(categoryService.getCategoryById(catId));
     }
 }
