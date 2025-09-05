@@ -6,6 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.SortTypes;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
@@ -17,7 +18,7 @@ import ru.yandex.practicum.statsdto.EndpointHit;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class EventPublicController {

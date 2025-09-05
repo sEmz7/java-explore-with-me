@@ -5,6 +5,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.event.dto.EventFullDto;
@@ -18,7 +19,7 @@ import ru.yandex.practicum.ewmmainserver.service.RequestService;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/users/{userId}/events")
 @RequiredArgsConstructor
 @Validated
