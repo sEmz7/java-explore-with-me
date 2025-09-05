@@ -1,6 +1,9 @@
 package ru.yandex.practicum.statsdto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class EndpointHit {
@@ -8,5 +11,6 @@ public class EndpointHit {
     private String app;
     private String uri;
     private String ip;
-    private String timestamp;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
 }
