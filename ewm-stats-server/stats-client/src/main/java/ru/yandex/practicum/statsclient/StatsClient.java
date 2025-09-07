@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.yandex.practicum.statsdto.EndpointHit;
+import ru.yandex.practicum.statsdto.ViewStats;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,19 +18,19 @@ import java.util.List;
 public class StatsClient extends BaseClientStats {
     private static final String HIT_URL = "/hit";
     private static final String GET_STATS_URL = "/stats";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-server.url:http://localhost:9090}") String serverUrl, RestTemplateBuilder builder) {
         super(builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                 .build());
     }
 
     public void hit(EndpointHit endpointHit) {
-        post(HIT_URL, null, endpointHit);
+        post(HIT_URL, null, endpointHit, Void.class);
     }
 
-    public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath(GET_STATS_URL)
                 .queryParam("start", start.format(formatter))
                 .queryParam("end", end.format(formatter))
@@ -41,6 +42,7 @@ public class StatsClient extends BaseClientStats {
             }
         }
 
-        return get(builder.toUriString(), null, null);
+        ResponseEntity<ViewStats[]> response = get(builder.toUriString(), null, ViewStats[].class);
+        return List.of(response.getBody());
     }
 }
