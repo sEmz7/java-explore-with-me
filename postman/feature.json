@@ -174,10 +174,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/1/events/1/comments",
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"1",
@@ -220,10 +222,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/users/1/events/1/comments/1",
+					"raw": "http://localhost:8080/users/1/events/1/comments/1",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"1",
@@ -258,10 +262,12 @@
 				"method": "PATCH",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/admin/events/comments/1?status=PUBLISHED",
+					"raw": "http://localhost:8080/admin/events/comments/1?status=PUBLISHED",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"admin",
 						"events",
@@ -300,10 +306,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/1/events/1/comments?from=0&size=10",
+					"raw": "http://localhost:8080/users/1/events/1/comments?from=0&size=10",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"1",
@@ -347,10 +355,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/1/events/1/comments/1",
+					"raw": "http://localhost:8080/users/1/events/1/comments/1",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"1",
@@ -383,10 +393,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/users/1/events/1/comments/1",
+					"raw": "http://localhost:8080/users/1/events/1/comments/1",
+					"protocol": "http",
 					"host": [
-						"{{baseUrl}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"users",
 						"1",
