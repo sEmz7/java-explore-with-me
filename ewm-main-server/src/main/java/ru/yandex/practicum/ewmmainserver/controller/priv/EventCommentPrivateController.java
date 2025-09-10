@@ -2,10 +2,12 @@ package ru.yandex.practicum.ewmmainserver.controller.priv;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.ewmmainserver.model.eventComment.dto.EventCommentRequestDto;
 import ru.yandex.practicum.ewmmainserver.model.eventComment.dto.EventCommentResponseDto;
@@ -16,7 +18,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/users/{userId}/events/{eventId}/comments")
 @RequiredArgsConstructor
-@Valid
+@Validated
 public class EventCommentPrivateController {
     private final EventCommentService eventCommentService;
 
@@ -46,8 +48,10 @@ public class EventCommentPrivateController {
     @GetMapping
     public ResponseEntity<List<EventCommentResponseDto>> getComments(@Positive @PathVariable long userId,
                                                                      @Positive @PathVariable long eventId,
-                                                                     @RequestParam(defaultValue = "0") int from,
-                                                                     @RequestParam(defaultValue = "10") int size) {
+                                                                     @PositiveOrZero @RequestParam(defaultValue = "0")
+                                                                         int from,
+                                                                     @Positive @RequestParam(defaultValue = "10")
+                                                                         int size) {
         return ResponseEntity.ok(eventCommentService.getCommentsByEvent(userId, eventId, from, size));
     }
 
